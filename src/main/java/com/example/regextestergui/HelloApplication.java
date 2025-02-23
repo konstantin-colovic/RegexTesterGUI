@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -28,7 +29,7 @@ public class HelloApplication extends Application {
 
         TextField regexField = new TextField();
         regexField.setPromptText("Enter the Regex used to test");
-        regexField.setPrefWidth(280);
+        regexField.setPrefWidth(220);
 
         TextArea textArea = new TextArea();
         textArea.setPromptText("Enter values to be tested here seperated by new lines");
@@ -47,7 +48,22 @@ public class HelloApplication extends Application {
         Button restartButton = new Button("Restart");
         restartButton.setTextFill(Color.RED);
 
-        HBox buttonBox = new HBox(regexField, testButton, returnButton, restartButton);
+        AtomicBoolean inverted = new AtomicBoolean(false);
+        CheckBox invert = new CheckBox("Invert");
+        invert.setPadding(new Insets(0, 0, 3, 0));
+        invert.setOnAction(event -> {
+            inverted.set(invert.isSelected());
+            if (invert.isSelected()) {
+                textArea.setPromptText("Enter regex to be tested here seperated by new lines");
+                regexField.setPromptText("Enter the String used to test");
+            }
+            else {
+                textArea.setPromptText("Enter values to be tested here seperated by new lines");
+                regexField.setPromptText("Enter the Regex used to test");
+            }
+        });
+
+        HBox buttonBox = new HBox(regexField, testButton, returnButton, restartButton, invert);
         buttonBox.setAlignment(Pos.BOTTOM_CENTER);
         buttonBox.setSpacing(10);
         buttonBox.setPadding(new Insets(20, 20, 20, 20));
@@ -70,9 +86,20 @@ public class HelloApplication extends Application {
                 List<String> inputs = Arrays.stream(textArea.getText().split("\n")).toList();
 
                 List<Text> texts = inputs.stream().map(input -> {
-                    String processedInput = "   " + input + (input.matches(regex) ? " -> Matches" : " -> Doesn't Match") + "\n";
+                    String processedInput = "  " + input;
+                    if (!inverted.get()) {
+                        processedInput += (input.matches(regex) ? " -> Matches" : " -> Doesn't Match") + "\n";
+                    }
+                    else {
+                        processedInput += (regex.matches(input) ? " -> Matches" : " -> Doesn't Match") + "\n";
+                    }
                     Text temp = new Text(processedInput);
-                    temp.setFill((input.matches(regex) ? Color.GREEN : Color.RED));
+                    if (!inverted.get()) {
+                        temp.setFill((input.matches(regex) ? Color.GREEN : Color.RED));
+                    }
+                    else {
+                        temp.setFill((regex.matches(input) ? Color.GREEN : Color.RED));
+                    }
                     return temp;
                 }).toList();
 
