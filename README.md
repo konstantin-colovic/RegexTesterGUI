@@ -1,7 +1,7 @@
 # Regex Tester for Offline Exam  
 
 ## Motivation  
-This tool is designed specifically for the **INHN0001 Exam** at **TUM Campus Heilbronn**, where locally developed programs are allowed—including this one!  
+This tool is designed specifically for the **Informatics** at **an CS university in Germany**, where locally developed programs are allowed—including this one!  
 
 Feel free to use it to test your **regular expressions** efficiently. 😊  
 
